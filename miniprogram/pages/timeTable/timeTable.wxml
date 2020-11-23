@@ -1,0 +1,13 @@
+<button bindtap="OneNet_Get">获取信息</button>
+
+<view hidden="{{hid}}">    <!--时间起始 结束的显示-->
+<button bindtap="edit">编辑</button>
+<view hidden="{{editcase}}">HOLO</view>
+<view hidden="{{editcase}}">Lawrence</view>
+<view>{{arrangements.actform}}</view>
+<view>{{arrangements.assignment}}</view>
+<view>起始时间 {{[arrangements.start.syear]}}年 {{arrangements.start.smonth}}月 {{arrangements.start.sday}}日 {{[arrangements.start.shour]}}时 {{arrangements.start.smin}}分</view>
+<view>结束时间 {{arrangements.finish.eyear}}年 {{arrangements.finish.emonth}}月 {{arrangements.finish.eday}}日 {{arrangements.finish.ehour}}时 {{arrangements.finish.emin}}分</view>
+
+<button hidden="{{editcase}}"></button>
+</view>
