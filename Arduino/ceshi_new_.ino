@@ -1,4 +1,5 @@
-//2020.2.19由天空之城编辑
+//本程序存在一些不稳定性，也可能是硬件存在一些不稳定性，有时可以正常操作，有时会显示一长串的错误信息。
+
 #include <Wire.h>
 #include "SSD1306Wire.h"
 #include "images.h"
@@ -33,7 +34,7 @@ const char OneNetServer[] = "api.heclouds.com";
 const char APIKEY[] = "kgP2rOrGwpry=RCfufSHPUfA9l0=";    // 段雨辰的API KEY
 int32_t DeviceId = 651255819;                             // 段雨辰的设备ID
 char DataStreams[] = "JTTr3Nzw";                // 数据流名称   //先前读取单个数据流时使用，后批量读取时未使用。
-const size_t MAX_CONTENT_SIZE =1200 ;                  // 最大内容长度    用来控制能读到的json数据的长度
+const size_t MAX_CONTENT_SIZE =2048 ;                  // 最大内容长度    用来控制能读到的json数据的长度
 const unsigned long HTTP_TIMEOUT = 2100;                // 超时时间
 
 int stream1;                           //用于存放返回数据流的数值
@@ -44,7 +45,7 @@ SSD1306Wire display(0x3c, 5, 4);   //SDA SCL
 typedef void (*Demo)(void);
 
 
-struct time1
+struct time1                 //用来存储事件的开始时间等内容
 {
   String starthour;
   String startmin;
@@ -58,7 +59,7 @@ struct time1
   String startequence;
   String assignment;
 };
-time1 a[2];
+time1 a[2];                  //由于不知名的原因，当读取过多的数据时，会导致显示一长串乱码或者显示解析错误等，所以只能设置为两个。
 
 
 struct UserData 
@@ -223,18 +224,20 @@ int readData(int DeviceId, char dataStream[])
       if(a[i].startequence<a[i+1].startequence)
         t=i;
     }
-    String line1=a[t].startmonth+"/"+a[t].startday;
+    String line1=a[t].startmonth+"/"+a[t].startday;                      //将几个数据拼接成一个后再进行显示
     String line2=a[t].starthour+":"+a[t].startmin+"~"+a[t].endhour+":"+a[t].endmin;
     String line3=a[t].assignment;
     display.clear();
     display.setTextAlignment(TEXT_ALIGN_LEFT);
     display.setFont(ArialMT_Plain_24);  
-    display.drawString(1, 1, line1);
+    display.drawString(1, 1, line1);     //按行显示
     display.drawString(1, 20, line2);
     display.drawString(1, 40, line3);
     display.display();
  }
- 
+//以上是读取onenet数据的函数
+//以下是读取天气信息的函数
+
 /*====================================画天气图标函数===============================*/
 void drawzhongyu() 
 {display.drawXbm(drawposition, 0, WiFi_Logo_width, WiFi_Logo_height, zhongyu);}
@@ -255,6 +258,8 @@ Demo demos[] = {drawqingtian, drawduoyun, drawxiaoyu, drawzhongyu, drawdayu, dra
 /*==============================================画图部分结束，接下来是数据处理部分=====================*/
 
 
+
+
 /*====================================连接WIFI函数===============================*/
 void wifi_start_connect()              
 {
@@ -273,39 +278,37 @@ void wifi_start_connect()
 }
 /*====================================连接WIFI函数结束===============================*/
 
+
+
 /*====================================解析天气数据函数===============================*/
 void parseUserData(String content)   
   {
     const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + 2 * JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(6) + 210;
     DynamicJsonBuffer jsonBuffer(capacity);
-    
     JsonObject& root = jsonBuffer.parseObject(content);
-    
     JsonObject& results_0 = root["results"][0];
-    
-    
     JsonObject& results_0_now = results_0["now"];
     //const char* results_0_now_text = results_0_now["text"];  // 天气情况
     int results_0_now_code = results_0_now["code"];  //天气情况识别码
     const char* results_0_now_temperature = results_0_now["temperature"];//气温
     
-    
     display.setTextAlignment(TEXT_ALIGN_LEFT);
     display.setFont(ArialMT_Plain_24);
     
     json_temp = results_0_now_temperature;   
-     
     json_state = results_0_now_code;
     
   }
 
 /*====================================解析天气数据函数结束===============================*/
 
+
+
+
 /*====================================调用api函数===============================*/
 
 void apicmd()
-{
-  if (client.connect("api.seniverse.com", 80) == 1)    //服务连接
+{ if (client.connect("api.seniverse.com", 80) == 1)    //服务连接
   {
     client.print("GET /v3/weather/now.json?key=");
     client.print(key);
@@ -317,34 +320,33 @@ void apicmd()
     client.print("Accept-Language:zh-cn\r\n");
     client.print("Connection:close\r\n\r\n");                 //向心知天气的服务器发送请求。
 
-
     if (client.find("\r\n\r\n") == 1)                         //跳过返回的json数据头，
-    {
-      String json_from_server = client.readStringUntil('\n'); //读取返回的JSON数据
+    { String json_from_server = client.readStringUntil('\n'); //读取返回的JSON数据
       Serial.println(json_from_server);                      //打印json数据
       parseUserData(json_from_server);                       //调用josn解析函数，并传参
     }
-    
   }
   else
   { Serial.println("服务器连接失败");
     delay(5000);
   }
-
   client.stop();                                            //关闭HTTP
 
 }
 
 /*====================================调用api函数===============================*/
 
-String days;
+
+
+String days;            //用于存储当前时间
 String months;
 String minutes;
 String hours; 
 
-
 String Middle_minutes;
 String Middle_hours;
+
+
 /*====================================时间获取函数===============================*/
 
 void updateDisplay(void) 
@@ -362,9 +364,6 @@ void updateDisplay(void)
   minutes = (String) minute(localTime);
   hours   = (String) hour(localTime); 
 
-
-
-
   if (Middle_minutes != minutes)
   {
     Serial.println("调用天气");
@@ -374,7 +373,9 @@ void updateDisplay(void)
 }
 /*====================================时间获取函数结束===============================*/
 
-/*====================================红外显示函数===============================*/
+
+
+/*====================================天气内容显示函数===============================*/
 
 void aaaa()
 {
@@ -402,7 +403,7 @@ void aaaa()
   display.display();
 }
 
-/*====================================红外显示函数结束===============================*/
+/*====================================天气内容显示函数结束===============================*/
 
 
 void setup() {
@@ -416,7 +417,7 @@ void setup() {
    
   initNTP(WiFiID, WiFiPW);
  
-  
+ 
   client.setTimeout(5000);//设置服务器连接超时时间
   pinMode (sensor,INPUT);
 
@@ -424,23 +425,21 @@ void setup() {
 time_t previousSecond = 0;
 void loop() {
   
-    if (timeStatus() != timeNotSet) 
-    {
-      if (second() != previousSecond) {
+    if (timeStatus() != timeNotSet)              //判断当前时间（分钟）是否改变，若改变，重新发送请求，否则不执行
+    { if (second() != previousSecond) {
         previousSecond = second();
         updateDisplay();
         }
     }
-    stream1=readData(DeviceId, DataStreams);
+    stream1=readData(DeviceId, DataStreams);     //向onenet请求数据
     Serial.println("closing connection");
 
     
     Serial.print(digitalRead(sensor));
-    if (digitalRead(sensor)==1)
+    if (digitalRead(sensor)==1)        //根据红外传感器的数据控制显示天气或是事件安排
       aaaa();
     else
       paixuxianshi();
       
-    
-    delay(3000);
+    delay(3000);       //延时，因为在前期测试时发现当手移开之后，红外传感器仍旧返回“1”,观察后发现若接入OLED 屏幕后才会出现这种情况，且其数据返回的形式与按键未消抖时相似，便引入delay，已达到“消抖”的目的
 }

@@ -1,4 +1,3 @@
-//2020.2.19由天空之城编辑
 #define WiFi_Logo_width  32
 #define WiFi_Logo_height  32
 #define drawposition  90

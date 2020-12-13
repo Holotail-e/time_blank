@@ -1,4 +1,3 @@
-//天空之城QQ785943161
 #ifndef NTP_H
 #define NTP_H
 
