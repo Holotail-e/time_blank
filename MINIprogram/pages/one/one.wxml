@@ -1,0 +1,7 @@
+<view>HOLOTAIL</view>
+
+<button bindtap="OneNet_Post">One net数据传输</button> 
+<view>Bathhouse</view>
+<button bindtap="OneNet_Get">One net获取数据</button>
+<view>{{temp1}}</view>
+<view>{{temp2}}</view>
