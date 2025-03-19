@@ -1,38 +1,29 @@
 {
   "pages": [
+    "pages/GreenHouse/GreenHouse",
     "pages/set/set",
-    "pages/timeTable/timeTable",
-    "pages/index/index"
-    
- 
-    
-   
+    "pages/control/control",
+    "pages/devlog/devlog"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#F6F6F6",
-    "navigationBarTitleText": "云开发 QuickStart",
+    "navigationBarTitleText": "Time Blank",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
     "list": [{
-      "pagePath": "pages/timeTable/timeTable",
-      "text": "日程安排",
-      "iconPath": "./icon/Clock.png",
-      "selectedIconPath": "./icon/Clock.png"
+      "pagePath": "pages/GreenHouse/GreenHouse",
+      "text": "大棚环境",
+      "iconPath": "./icon/Env.png",
+      "selectedIconPath": "./icon/Env.png"
     },
     {
-      "pagePath": "pages/set/set",
-      "text": "日程安排",
-      "iconPath": "./icon/Activity.png",
-      "selectedIconPath": "./icon/Activity.png"
-    },
-    {
-      "pagePath": "pages/index/index",
+      "pagePath": "pages/control/control",
       "text": "我的",
-      "iconPath": "./icon/Profile.png",
-      "selectedIconPath": "./icon/Profile.png"
+      "iconPath": "./icon/MY.png",
+      "selectedIconPath": "./icon/MYSelected.png"
     }
   ]
   },

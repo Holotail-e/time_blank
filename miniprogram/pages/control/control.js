@@ -1,4 +1,4 @@
-// pages/set/set.js
+// pages/control/control.js
 Page({
 
   /**
@@ -21,7 +21,11 @@ Page({
   onReady() {
 
   },
-
+  jump(){
+    wx.navigateTo({
+      url: '../devlog/devlog',
+    })
+  },
   /**
    * 生命周期函数--监听页面显示
    */
